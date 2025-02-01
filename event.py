@@ -35,7 +35,7 @@ class Wind(Event):
 
 # TODO: get values from AI
 class Disease(Event):
-    def __init__(self, diffusion_coeff: float, infection_p: float = 0.99, healthy_threshold: float = 0.5, disease_threshold: float = 0.8):
+    def __init__(self, diffusion_coeff: float, infection_p: float = 0.25, healthy_threshold: float = 0.5, disease_threshold: float = 0.8):
         self.diffusion_coeff = diffusion_coeff
         self.infection_p = infection_p # chance of randomly getting infected e.g from bugs
         self.healthy_threshold = healthy_threshold
