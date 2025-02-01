@@ -1,41 +1,40 @@
 from abc import ABC, abstractmethod
-
-class CellElem(ABC):
-    def __init__(self, cost: float):
-        self.cost = cost
-        return
     
-    @abstractmethod
-    def step(self):
-        pass
-    
-class Wall(CellElem):
+class Wall():
     def __init__(self, cost: float, durability: float):
-        super().__init__(cost)
+        self.cost = cost
         self.durability = durability
     
     def step(self):
         print("Wall step")
         return
     
-class Fence(CellElem):
+class Fence():
     def __init__(self, cost: float, durability: float):
-        super().__init__(cost)
+        self.cost = cost
         self.durability = durability
 
     def step(self):
         print("Fence step")
         return
     
-class Crop(CellElem):
-    def __init__(self, cost: float, age: float, growth_rate: float, alive: bool = True):
-        super().__init__(cost)
-        self.age = age
+class Crop():
+    def __init__(self, cost: float, growth_rate: float, hydration: float = 100.0):
+        self.cost = cost
         self.growth_rate = growth_rate
-        self.alive = alive
+        self.hydration = hydration
+    
+    def soak(self, water: float = 25.0):
+        self.hydration += water
+    
+    def dry(self, sun: float = 25.0):
+        self.hydration -= sun
+
+    def is_dead(self):
+        return self.hydration <= 0.0 or self.hydration >= 150.0
 
     def step(self):
-        self.age += self.growth_rate
-        print(f"Crop step {self.age}")
+        self.hydration += self.growth_rate
+        print(f"Crop step {self.hydration}")
     
 

@@ -7,12 +7,15 @@ if __name__ == "__main__":
     fenced = Cell(fence=Fence(1, 1))
 
     grid = [
-            [Cell(crop=Crop(1, 1, 1)), Cell(crop=Crop(1, 1, 1)), Cell(crop=Crop(1, 1, 1))],
-            [Cell(crop=Crop(1, 1, 1)), Cell(crop=Crop(1, 1, 1)), Cell(crop=Crop(1, 1, 1))],
-            [Cell(crop=Crop(1, 1, 1)), Cell(crop=Crop(1, 1, 1)), Cell(crop=Crop(1, 1, 1))]
+            [Cell(crop=Crop(1, 1)), Cell(crop=Crop(1, 1)), walled],
+            [Cell(crop=Crop(1, 1)), walled, Cell(crop=Crop(1, 1))],
+            [Cell(crop=Crop(1, 1)), walled, Cell(crop=Crop(1, 1))]
     ]
 
     print_grid(grid)
     sim = Simulation(grid)
-    sim.flood((0, 1))
-    print_grid(grid)
+    for _ in range(4):
+        sim.flood((0, 0))
+        print_grid(grid)
+        sim.drought()
+        print_grid(grid)
