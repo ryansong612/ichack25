@@ -19,10 +19,17 @@ class Fence():
         return
     
 class Crop():
-    def __init__(self, cost: float, growth_rate: float, hydration: float = 100.0):
+    def __init__(self, cost: float, growth_rate: float, hydration: float = 100.0, alive: bool = True, health: float = 0):
+        # self.age = age # have for growing
         self.cost = cost
         self.growth_rate = growth_rate
         self.hydration = hydration
+        self.alive = alive
+        self.health = health # I thresholded by Disease.disease_threshold
+    
+        
+    def sicken(self, amount: float = 0.2):
+        self.health += amount
     
     def soak(self, water: float = 25.0):
         self.hydration += water
@@ -32,9 +39,3 @@ class Crop():
 
     def is_dead(self):
         return self.hydration <= 0.0 or self.hydration >= 150.0
-
-    def step(self):
-        self.hydration += self.growth_rate
-        print(f"Crop step {self.hydration}")
-    
-
