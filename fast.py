@@ -1,24 +1,20 @@
 from fastapi import FastAPI
-from models import Grid
-from crop import db
+from pydantic import BaseModel
+from main import main
 
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    print("HI")
-    return {"message": "hi"}
+class CropsModel(BaseModel):
+    percentages: dict[str, float]
+    location: str
+    curr_month: int
 
-@app.get("/get_all_crops")
-def supported():
-    return {"supported": list(db.keys())}
+@app.post("/get_all_crops")
+def get_crop_percentages(req: CropsModel):
+    print(req)
+    return main(req)
 
-@app.get("/state/")
-def read_item(grid: Grid):
-    print("Hi")
-    return {"item_id": grid}
-
-@app.post("/send/")
-def send_updated(grid: Grid):
-    return grid
-
+@app.post("/send/", response_model=CropsModel)
+def send_updated(updated_percentages, location, curr_month):
+    crop_data = CropsModel(updated_percentages, location, curr_month)
+    return crop_data
