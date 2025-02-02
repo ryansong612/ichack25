@@ -49,14 +49,6 @@ def format_response(response):
         name = disaster.find('name').text
         probability = disaster.find('probability').text
         
-        parameters = {}
-        param_text = disaster.find('parameters').text
-        if param_text:
-            for line in param_text.strip().split('\n'):
-                if ':' in line:
-                    key, value = line.split(':', 1)
-                    parameters[key.strip()] = value.strip()
-        
         disasters[name] = {
             "probability": probability,
         }

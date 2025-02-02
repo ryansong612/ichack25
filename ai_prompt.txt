@@ -28,7 +28,7 @@ Your task is to analyze the weather conditions and determine the probability of 
    b. Consider the disaster parameters and how they relate to the current weather conditions.
    c. Calculate a probability (as a percentage) for the occurrence of this disaster based on your analysis.
 
-Provide your analysis and results in the following format:
+Provide your analysis and results in the following format, all data can only be numbers:
 
 <disaster_analysis>
 <disaster>
