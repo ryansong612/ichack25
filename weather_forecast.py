@@ -1,9 +1,12 @@
 
 import requests
+from dotenv import load_dotenv
+import os
 from geopy import geocoders
 from geopy.geocoders import Nominatim
 
-API_KEY = "8311f2fe1cc94842390ffb16ab85d05d"
+load_dotenv()
+API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
 def weather_forecast(location):
     geolocator = Nominatim(user_agent='x@gmail.com')

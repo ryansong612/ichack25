@@ -1,10 +1,13 @@
 import anthropic
+from dotenv import load_dotenv
+import os
 
 import xml.etree.ElementTree as ET
 
 # Call this function with the weather data to get the event prediction in a dictionary
 def weather_to_event(weather_data):
-    API_KEY = "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"
+    load_dotenv()
+    API_KEY = os.getenv("ANTHROPIC_API_KEY")
 
     client = anthropic.Anthropic(
         api_key=API_KEY,
