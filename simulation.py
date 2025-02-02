@@ -7,14 +7,35 @@ from utils import *
 
 # TODO: get flood/disease parameters from AI
 class Simulation:
-    def __init__(self, grid: List[List["Cell"]], disease: Disease, flood: Flood):
+    def __init__(self, 
+                 grid: List[List["Cell"]], 
+                 flood : "Flood",
+                 drought: "Drought",
+                 heat_wave: "HeatWave",
+                 cold_snap: "ColdSnap",
+                 wind: "Wind",
+                 disease: "Disease"
+    ):
         self.grid = grid
         self.decay = 5
 
-        self.disease = disease
         self.flood = flood
+        self.drought = drought
+        self.heat_wave = heat_wave
+        self.cold_snap = cold_snap
+        self.wind = wind
+        self.disease = disease
+
 
     def simulate(self):
+        # event step
+        self.start_flood()
+        self.start_drought()
+        self.start_heat_wave()
+        self.start_cold_snap()
+        self.start_disease()
+
+        # natural step
         for row in self.grid:
             for cell in row:
                 for elem in cell.elems:
@@ -22,56 +43,111 @@ class Simulation:
 
     # a flood must start from one of the edges of the grid
     def start_flood(self):
-        print("flooding")
-
-        ix, iy = self.flood.source
-        if ix != 0 and iy != 0 and ix != len(self.grid) - 1 and iy != len(self.grid[0]) - 1:
-            raise ValueError("Start must be on the edge of the grid")
-        queue = deque([self.flood.source])
-        visited = set([self.flood.source])
-        ds = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-        while queue:
-            x, y = queue.popleft()
-            if self.grid[x][y].fence or self.grid[x][y].wall:
-                continue
-            self.grid[x][y].flood()
-            for dx, dy in ds:
-                nx, ny = x + dx, y + dy
-                if 0 <= nx < len(self.grid) and 0 <= ny < len(self.grid[0]):
-                    if (nx, ny) in visited:
-                        continue
-                    visited.add((nx, ny))
-                    queue.append((nx, ny))
-
-    def drought(self, drought: "Drought"):
-        print("droughting")
-        for row in self.grid:
-            for cell in row:
-                cell.dry()
-    
-
-    def heat_wave(self, heat: "HeatWave"):
-        print("heating")
-        if heat.offset < 3:
-            heat.offset += 1
+        if not self.flood:
             return
-        for row in self.grid:
-            for cell in row:
-                if cell.crop:
-                    cell.crop.hydration -= heat.temperature / self.decay
+    
+        if self.flood.duration <= 0:
+            self.flood = None
+            return
+        
+
+        self.flood.duration -= 1
+        if random.random() < self.flood.chance:
+            print("flooding")
+
+            ix, iy = self.flood.source
+            if ix != 0 and iy != 0 and ix != len(self.grid) - 1 and iy != len(self.grid[0]) - 1:
+                raise ValueError("Start must be on the edge of the grid")
+            queue = deque([self.flood.source])
+            visited = set([self.flood.source])
+            ds = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+            while queue:
+                x, y = queue.popleft()
+                if self.grid[x][y].fence or self.grid[x][y].wall:
+                    continue
+                self.grid[x][y].flood()
+                for dx, dy in ds:
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < len(self.grid) and 0 <= ny < len(self.grid[0]):
+                        if (nx, ny) in visited:
+                            continue
+                        visited.add((nx, ny))
+                        queue.append((nx, ny))
+        
+        if self.flood.duration <= 0:
+            self.flood = None
+        return
+
+    def start_drought(self, chance):
+        if not self.drought:
+            return
+        
+        if self.drought.duration <= 0:
+            self.drought = None
+            return
+        
+        if random.random() < chance:
+            print("droughting")
+            for row in self.grid:
+                for cell in row:
+                    cell.dry()
+
+        self.drought.duration -= 1
+        if self.drought.duration <= 0:
+            self.drought = None
         return
     
-    def cold_snap(self, cold: "ColdSnap"):
+
+    def start_heat_wave(self, chance):
+        if not self.heat_wave:
+            return
+        
+        if self.heat_wave.duration <= 0:
+            self.heat_wave = None
+            return
+        
+        if random.random() < chance:
+            print("heat waving")
+            for row in self.grid:
+                for cell in row:
+                    cell.heat_up()
+
+        self.heat_wave.duration -= 1
+        if self.heat_wave.duration <= 0:
+            self.heat_wave = None
+        return
+    
+    def start_cold_snap(self, cold: "ColdSnap"):
+        if not self.cold_snap:
+            return
+        
+        if self.cold_snap.duration <= 0:
+            self.cold_snap = None
+            return
+        
         print("cooling")
         for row in self.grid:
             for cell in row:
                 if cell.crop:
                     cell.crop.hydration -= abs(cold.temperature) / self.decay
+        
+        self.cold_snap.duration -= 1
+        if self.cold_snap.duration <= 0:
+            self.cold_snap = None
         return
+    
+
     
     # a disease can start from any of the crops, each with probability p
     # runs one time step of the disease simulation
     def start_disease(self):
+        if not self.disease:
+            return
+        
+        if self.disease.duration <= 0:
+            self.disease = None
+            return
+
         print("diseasing")
         
         n, m = len(self.grid), len(self.grid[0])
@@ -125,8 +201,14 @@ class Simulation:
                     if self.grid[x][y].crop.health < self.disease.healthy_threshold:
                         if random.random() < self.disease.infection_p:
                             self.grid[x][y].crop.sicken() # TODO: another parameter
+                
+        # print("New infections", new_infections)
 
-    
+        self.disease.duration -= 1
+        if self.disease.duration <= 0:
+            self.disease = None
+        return
+
 class Cell:
     def __init__(self, 
                  wall: "Wall" = None, 

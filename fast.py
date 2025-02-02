@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from models import Grid
+from crop import db
 
 app = FastAPI()
 
@@ -7,6 +8,10 @@ app = FastAPI()
 def read_root():
     print("HI")
     return {"message": "hi"}
+
+@app.get("/get_all_crops")
+def supported():
+    return {"supported": list(db.keys())}
 
 @app.get("/state/")
 def read_item(grid: Grid):
