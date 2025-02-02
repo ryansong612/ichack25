@@ -8,7 +8,6 @@ First, you will be given the weather conditions in the following format:
 
 Next, you will be provided with a list of potential natural disasters that could affect a farm, along with each of their models and parameters needed:
 
-<natural_disasters>
 1. Disease (diffusion model) diffusion coefficient, infection probability (probability of getting randomly infected), initial_sickness_value (between 0.5 and 1) biased towards 0.5
 
 2. Flooding - duration in number of hours in multiple of 3 hours
@@ -20,7 +19,6 @@ Next, you will be provided with a list of potential natural disasters that could
 5. ColdSnap - temperature in degrees
 
 6. Wind - windspeed in knots
-</natural_disasters>
 
 Your task is to analyze the weather conditions and determine the probability of each disaster occurring, as well as provide relevant parameters for each potential disaster. Follow these steps:
 
