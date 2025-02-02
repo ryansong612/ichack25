@@ -29,8 +29,6 @@ Your task is to analyze the weather conditions and determine the probability of 
    a. Analyze how the current weather conditions might contribute to or mitigate the risk of this disaster.
    b. Consider the disaster parameters and how they relate to the current weather conditions.
    c. Calculate a probability (as a percentage) for the occurrence of this disaster based on your analysis.
-   d. Determine relevant parameters for the disaster, if it were to occur, based on the current conditions.
-   e. For each weather condition, list how the disaster might affect the weather conditions tomorrow for each parameter using a numeric value to change for the numerical values, or suggest a different value for non numeric values, for example from "Cloudy" to "Sunny".
 
 Provide your analysis and results in the following format:
 
@@ -38,12 +36,6 @@ Provide your analysis and results in the following format:
 <disaster>
 <name>[Name of the disaster]</name>
 <probability>[Probability as a percentage]</probability>
-<parameters>
-[List relevant parameters for this disaster based on the current conditions]
-</parameters>
-<changes>
-[Weather Condition][How the value will change if the disaster happened]
-</changes>
 </disaster>
 [Repeat the above structure for each disaster]
 </disaster_analysis>
