@@ -1,8 +1,7 @@
 from typing import List, Set
 from elem import *
 from event import *
-from collections import  deque
-
+from collections import deque
 
 def print_grid(grid: List[List["Cell"]]):
     for row in grid:
