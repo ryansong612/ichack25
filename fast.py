@@ -9,12 +9,12 @@ class CropsModel(BaseModel):
     location: str
     curr_month: int
 
-@app.post("/get_all_crops")
-def get_crop_percentages(req: CropsModel):
-    print(req)
-    return main(req)
-
 @app.post("/send/", response_model=CropsModel)
-def send_updated(updated_percentages, location, curr_month):
-    crop_data = CropsModel(updated_percentages, location, curr_month)
-    return crop_data
+def send_updated(req: CropsModel):
+    main(req)
+    data = {
+    "percentages": {"wheat": 75.5, "corn": 60.2},
+    "location": "Texas",
+    "curr_month": 2
+    }
+    return data
