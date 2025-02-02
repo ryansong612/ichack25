@@ -34,7 +34,7 @@ def print_grid_health(grid):
                     print(f"{'X':>6}", end="")
                 else:
                     # Otherwise print HP in 6 chars, two decimals, right-aligned
-                    print(f"{cell.crop.health:6.1f}", end="")
+                    print(f"{cell.crop.health:6.2f}", end="")
             else:
                 print(f"{' ':>6}", end="")
         print()

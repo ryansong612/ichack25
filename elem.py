@@ -28,7 +28,7 @@ class Crop():
         self.health = health # I thresholded by Disease.disease_threshold
     
         
-    def sicken(self, amount: float = 0.1): # TODO: to be determined parameter
+    def sicken(self, amount: float = 0.42): # TODO: to be determined parameter
         self.health += amount
     
     def soak(self, water: float = 25.0):

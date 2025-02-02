@@ -5,35 +5,11 @@ from collections import  deque
 import random
 from utils import *
 
-
-def print_grid_(grid: List[List["Cell"]]):
-    for row in grid:
-        for cell in row:
-            if cell.wall:
-                # Let's make walls occupy the same width
-                print(f"{'W':>6}", end="")
-            elif cell.fence:
-                print(f"{'F':>6}", end="")
-            elif cell.crop:
-                # If HP is <= 0, print "X" right-aligned in 6 chars
-                if cell.crop.is_dead():
-                    print(f"{'X':>6}", end="")
-                else:
-                    # Otherwise print HP in 6 chars, two decimals, right-aligned
-                    print(f"{cell.crop.hydration:6.0f}", end="")
-            else:
-                print(f"{' ':>6}", end="")
-        print()
-    print()
-
-
-
 # TODO: get flood/disease parameters from AI
 class Simulation:
     def __init__(self, grid: List[List["Cell"]], disease: Disease, flood: Flood):
         self.grid = grid
         self.decay = 5
-        self.events = []
 
         self.disease = disease
         self.flood = flood
@@ -66,14 +42,12 @@ class Simulation:
                         continue
                     visited.add((nx, ny))
                     queue.append((nx, ny))
-        # self.simulated_event(self.flood)
 
     def drought(self, drought: "Drought"):
         print("droughting")
         for row in self.grid:
             for cell in row:
                 cell.dry()
-        self.simulated_event(drought)
     
 
     def heat_wave(self, heat: "HeatWave"):
@@ -85,7 +59,6 @@ class Simulation:
             for cell in row:
                 if cell.crop:
                     cell.crop.hydration -= heat.temperature / self.decay
-        self.simulated_event(heat)
         return
     
     def cold_snap(self, cold: "ColdSnap"):
@@ -94,20 +67,7 @@ class Simulation:
             for cell in row:
                 if cell.crop:
                     cell.crop.hydration -= abs(cold.temperature) / self.decay
-        self.simulated_event(cold)
         return
-
-    
-    def simulated_event(self, event: "Event"):
-        event.duration -= 1
-        if event.duration == 0:
-            self.events.remove(event)
-
-    
-    def add_event(self, event: "Event"):
-        self.events.append(event)
-    
-
     
     # a disease can start from any of the crops, each with probability p
     # runs one time step of the disease simulation
@@ -118,11 +78,11 @@ class Simulation:
         # initialize queue with all currently infected crops (healthy_threshold < health < disease_threshold)
         queue = deque(
             [(x, y) for x in range(n) for y in range(m) 
-             if self.grid[x][y].crop and self.grid[x][y].crop.health > self.disease.healthy_threshold and self.grid[x][y].crop.health < self.disease.disease_threshold
+             if self.grid[x][y].crop and self.grid[x][y].crop.health > self.disease.healthy_threshold
             ]
         )
         
-        print("All infected crops", queue)
+        print("All infected (and not dead) crops", queue)
 
         ds = [(0, 1), (0, -1), (1, 0), (-1, 0)]
         new_infections = deque()
@@ -132,10 +92,11 @@ class Simulation:
             # Spread to neighbors
             for dx, dy in ds:
                 nx, ny = x + dx, y + dy
+                if 0 < nx or nx >= n or 0 < ny or ny >= m:
+                    continue
                 if self.grid[nx][ny].wall or self.grid[nx][ny].fence:
                     continue
                 if self.grid[nx][ny].crop.health < self.disease.healthy_threshold:  # if not infected already
-                    print("HII")
                     D = self.disease.diffusion_coeff
                     # only diffuse from more infected to less infected
                     health_current = self.grid[x][y].crop.health
@@ -145,10 +106,10 @@ class Simulation:
                     if health_current > health_neighbour:  # Spread from x,y → nx,ny
                         self.grid[nx][ny].crop.health += diffusion_effect # neighbour gets infected more
                     else: # Spread from nx,ny → x, y
-                        self.grid[x][y] += diffusion_effect  
+                        self.grid[x][y].crop.health += diffusion_effect  
 
                     # if newly infected, add to queue
-                    if self.grid[nx][ny] > 0 and (nx, ny) not in queue and (nx, ny) not in new_infections:
+                    if self.grid[nx][ny].crop.health > 0 and (nx, ny) not in queue and (nx, ny) not in new_infections:
                         new_infections.append((nx, ny))
                         
             
@@ -164,8 +125,7 @@ class Simulation:
                     if self.grid[x][y].crop.health < self.disease.healthy_threshold:
                         if random.random() < self.disease.infection_p:
                             self.grid[x][y].crop.sicken() # TODO: another parameter
-                
-        # print("New infections", new_infections)
+
     
 class Cell:
     def __init__(self, 
